@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { styles } from "../styles/styles";
 
@@ -19,6 +20,20 @@ const Onboarding = () => {
     } else {
       setValid(false);
     }
+  };
+
+  const storeData = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      console.log(jsonValue);
+      await AsyncStorage.setItem("onboard", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleOnboarding = () => {
+    storeData({ firstName, email, isOnboardingCompleted: true });
   };
 
   useEffect(() => {
@@ -72,7 +87,7 @@ const Onboarding = () => {
         />
         <TouchableOpacity
           style={[styles.button, !valid && styles.disabledButton]}
-          onPress={() => handleValidation()}
+          onPress={() => handleOnboarding()}
           disabled={!valid}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
