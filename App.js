@@ -51,7 +51,7 @@ export default function App() {
         }}>
         {state.isOnboardingCompleted ? (
           <>
-            <Stack.Screen name="Home" component={HomeScreen} />
+            {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
             <Stack.Screen name="Profile" component={ProfileScreen} />
           </>
         ) : (
