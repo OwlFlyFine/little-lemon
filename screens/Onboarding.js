@@ -25,15 +25,15 @@ const Onboarding = () => {
   const storeData = async (value) => {
     try {
       const jsonValue = JSON.stringify(value);
-      console.log(jsonValue);
       await AsyncStorage.setItem("onboard", jsonValue);
     } catch (e) {
       console.log(e);
     }
   };
 
-  const handleOnboarding = () => {
+  const handleOnboardingComplete = () => {
     storeData({ firstName, email, isOnboardingCompleted: true });
+    navigation.navigate("Profile", { firstName, email });
   };
 
   useEffect(() => {
@@ -87,7 +87,7 @@ const Onboarding = () => {
         />
         <TouchableOpacity
           style={[styles.button, !valid && styles.disabledButton]}
-          onPress={() => handleOnboarding()}
+          onPress={() => handleOnboardingComplete()}
           disabled={!valid}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
