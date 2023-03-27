@@ -50,6 +50,12 @@ export const styles = StyleSheet.create({
     resizeMode: "contain",
     borderRadius: 16,
   },
+  headerImage: {
+    width: 40,
+    height: 40,
+    resizeMode: "contain",
+    borderRadius: 16,
+  },
   form: {
     marginTop: 20,
   },
@@ -60,17 +66,17 @@ export const styles = StyleSheet.create({
     marginBottom: 2,
   },
   input: {
-    height: 50,
+    height: 40,
     borderColor: colors.disabled,
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 20,
+    marginBottom: 10,
   },
   button: {
     height: 50,
-    backgroundColor: "#23a8d9",
-    borderRadius: 5,
+    backgroundColor: colors.primary1,
+    borderRadius: 16,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -97,5 +103,46 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.white,
     fontFamily: "Karla-Regular",
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    fontFamily: "Karla-Regular",
+    marginBottom: 10,
+  },
+  checkbox: {
+    margin: 8,
+  },
+  leftItem: {
+    flex: 1,
+    paddingLeft: 4,
+    alignItems: "flex-start",
+    paddingBottom: 4,
+  },
+  rightItem: {
+    flex: 1,
+    paddingRight: 4,
+    alignItems: "flex-end",
+    paddingBottom: 4,
+  },
+  headerItem: {
+    flex: 2,
+    paddingBottom: 4,
+    alignItems: "center",
+  },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  fixToButton: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    gap: 10,
   },
 });
