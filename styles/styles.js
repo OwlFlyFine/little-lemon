@@ -50,6 +50,22 @@ export const styles = StyleSheet.create({
     resizeMode: "contain",
     borderRadius: 16,
   },
+  avatarContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 16,
+    marginLeft: 4,
+    alignItems: "center",
+    overflow: "hidden",
+    backgroundColor: "white",
+    alignSelf: "center",
+  },
+  avatar: {
+    width: 120,
+    height: 120,
+    resizeMode: "contain",
+    borderRadius: 16,
+  },
   headerImage: {
     width: 40,
     height: 40,

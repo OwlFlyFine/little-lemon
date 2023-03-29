@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Button, Image, TouchableOpacity } from "react-native";
+import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as ImagePicker from "expo-image-picker";
 
 import { styles } from "../styles/styles";
 import { colors } from "../styles/colors";
@@ -29,6 +31,57 @@ const Profile = () => {
   const handlePhoneNumber = (text) =>
     setUserInfo({ ...userInfo, phoneNumber: text });
 
+  const clearUserInfo = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const storeUserInfo = async (value) => {
+    try {
+      const jsonValue = JSON.stringify(value);
+      await AsyncStorage.setItem("userInfo", jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const getUserInfo = async (key) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(key);
+      const parse = JSON.parse(jsonValue);
+      setUserInfo({
+        ...userInfo,
+        firstName: parse.firstName,
+        email: parse.email,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setUserInfo({ ...userInfo, profilePicture: result.assets[0].uri });
+    }
+  };
+
+  useEffect(() => {
+    getUserInfo("onboard");
+  }, []);
+
+  console.log(userInfo);
+
   return (
     <View style={styles.container}>
       <PageHeader
@@ -47,32 +100,27 @@ const Profile = () => {
             style={styles.logo}
           />
         }
-        rightNode={
-          <Image
-            source={require("../assets/images/Profile.png")}
-            style={styles.headerImage}
-          />
-        }
+        rightNode={null}
       />
-      <View style={styles.form}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.form}>
         <HeaderTitle title="Personal Information" />
         <View>
           <Text>Avatar</Text>
-          <Image
-            source={require("../assets/images/Profile.png")}
-            style={styles.logo}
-          />
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-evenly",
-              alignItems: "center",
-            }}>
-            <TouchableOpacity style={styles.button} onPress={() => undefined}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={
+                userInfo.profilePicture
+                  ? { uri: userInfo.profilePicture }
+                  : require("../assets/images/Profile.png")
+              }
+              style={styles.avatar}
+            />
+          </View>
+          <View style={{ alignSelf: "center" }}>
+            <TouchableOpacity
+              style={[styles.button, { height: 30 }]}
+              onPress={() => pickImage()}>
               <Text style={styles.buttonText}>Change</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => undefined}>
-              <Text style={styles.buttonText}>Remove</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -129,7 +177,7 @@ const Profile = () => {
             styles.button,
             { backgroundColor: colors.primary2, marginBottom: 10 },
           ]}
-          onPress={() => undefined}>
+          onPress={() => clearUserInfo()}>
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
         <View style={styles.fixToButton}>
@@ -151,11 +199,19 @@ const Profile = () => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, { flex: 1, height: 40 }]}
-            onPress={() => undefined}>
+            onPress={() =>
+              storeUserInfo({
+                ...userInfo,
+                emailOrderStatuses,
+                emailPasswordChanges,
+                emailSpecialOffers,
+                emailNewsletter,
+              })
+            }>
             <Text style={styles.buttonText}>Save changes</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
