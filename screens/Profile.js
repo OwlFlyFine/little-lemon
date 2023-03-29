@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
+import UserAvatar from "@muhzi/react-native-user-avatar";
 
 import { styles } from "../styles/styles";
 import { colors } from "../styles/colors";
@@ -63,7 +64,6 @@ const Profile = () => {
   };
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
@@ -79,8 +79,6 @@ const Profile = () => {
   useEffect(() => {
     getUserInfo("onboard");
   }, []);
-
-  console.log(userInfo);
 
   return (
     <View style={styles.container}>
@@ -104,25 +102,24 @@ const Profile = () => {
       />
       <ScrollView showsVerticalScrollIndicator={false} style={styles.form}>
         <HeaderTitle title="Personal Information" />
-        <View>
+        <View
+          style={{
+            gap: 4,
+            alignItems: "center",
+            alignSelf: "center",
+            marginBottom: 10,
+          }}>
           <Text>Avatar</Text>
-          <View style={styles.avatarContainer}>
-            <Image
-              source={
-                userInfo.profilePicture
-                  ? { uri: userInfo.profilePicture }
-                  : require("../assets/images/Profile.png")
-              }
-              style={styles.avatar}
-            />
-          </View>
-          <View style={{ alignSelf: "center" }}>
-            <TouchableOpacity
-              style={[styles.button, { height: 30 }]}
-              onPress={() => pickImage()}>
-              <Text style={styles.buttonText}>Change</Text>
-            </TouchableOpacity>
-          </View>
+          <UserAvatar
+            userName={userInfo.firstName + userInfo.lastName}
+            size={80}
+            src={userInfo.profilePicture}
+          />
+          <TouchableOpacity
+            style={[styles.button, { height: 30, width: 100 }]}
+            onPress={() => pickImage()}>
+            <Text style={styles.buttonText}>Change</Text>
+          </TouchableOpacity>
         </View>
         <FormInput
           title="First Name"
