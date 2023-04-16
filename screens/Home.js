@@ -22,16 +22,13 @@ import {
   getMenuItems,
   saveMenuItems,
   filterByQueryAndCategories,
+  dropTable,
 } from "../utils/database";
+import { useUpdateEffect } from "../utils/utils";
 
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
-const sections = [
-  { id: 1, name: "Starters" },
-  { id: 2, name: "Mains" },
-  { id: 3, name: "Desserts" },
-  { id: 4, name: "Drinks" },
-];
+const sections = ["Starters", "Mains", "Desserts", "Drinks"];
 
 const Item = ({ name, price, description, image, category }) => (
   <View style={styles.item}>
@@ -110,7 +107,6 @@ const Home = () => {
   const handleFiltersChange = async (index) => {
     const arrayCopy = [...filterSelections];
     arrayCopy[index] = !filterSelections[index];
-    console.log("filters ", arrayCopy);
     setFilterSelections(arrayCopy);
   };
 
@@ -126,15 +122,39 @@ const Home = () => {
 
         if (!menuItems.length) {
           menuItems = await fetchData();
-          saveMenuItems(menuItems);
+          console.log(menuItems);
+          menuItems.map((item) => saveMenuItems(item));
         }
         setData(menuItems);
       } catch (e) {
-        // Handle error
+        console.log(e.message);
         Alert.alert(e.message);
       }
     })();
   }, []);
+
+  useUpdateEffect(() => {
+    (async () => {
+      const activeCategories = sections.filter((s, i) => {
+        if (filterSelections.every((item) => item === false)) {
+          return true;
+        }
+        return filterSelections[i];
+      });
+      console.log("active category ", activeCategories);
+      try {
+        const menuItems = await filterByQueryAndCategories(
+          query,
+          activeCategories
+        );
+        console.log("search menu item ", menuItems);
+        setData(menuItems);
+      } catch (e) {
+        console.log(e);
+        Alert.alert(e.message);
+      }
+    })();
+  }, [filterSelections, query]);
 
   return (
     <SafeAreaView style={[styles.container, { padding: 0 }]}>
