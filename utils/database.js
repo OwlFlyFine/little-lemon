@@ -40,13 +40,13 @@ export async function saveMenuItems(menuItems) {
 }
 
 export async function filterByQueryAndCategories(query, activeCategories) {
-  //   console.log("query ", query);
-  const categoriesString = activeCategories.map((c) => `'${c}'`).join(", ");
-  //   console.log("category ", categoriesString);
+  const categoriesString = activeCategories
+    .map((c) => `'${c.toLowerCase()}'`)
+    .join(", ");
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `select * from menuitems where name like '%${query}%' and category in (${categoriesString})`,
+        `select * from menuitems where category in (${categoriesString})`,
         [],
         (_, { rows }) => {
           resolve(rows._array);
