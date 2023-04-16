@@ -161,4 +161,13 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
   },
+  roundButton: {
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 10,
+    borderRadius: 100,
+    backgroundColor: colors.white,
+  },
 });
