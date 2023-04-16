@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Image,
@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserAvatar from "@muhzi/react-native-user-avatar";
 import { useNavigation } from "@react-navigation/native";
+import debounce from "lodash.debounce";
 
 import { styles } from "../styles/styles";
 import { colors } from "../styles/colors";
@@ -22,7 +23,6 @@ import {
   getMenuItems,
   saveMenuItems,
   filterByQueryAndCategories,
-  dropTable,
 } from "../utils/database";
 import { useUpdateEffect } from "../utils/utils";
 
@@ -104,6 +104,17 @@ const Home = () => {
     }
   };
 
+  const lookup = useCallback((q) => {
+    setQuery(q);
+  }, []);
+
+  const debouncedLookup = useMemo(() => debounce(lookup, 500), [lookup]);
+
+  const handleSearchChange = (text) => {
+    setSearchBarText(text);
+    debouncedLookup(text);
+  };
+
   const handleFiltersChange = async (index) => {
     const arrayCopy = [...filterSelections];
     arrayCopy[index] = !filterSelections[index];
@@ -141,13 +152,12 @@ const Home = () => {
         }
         return filterSelections[i];
       });
-      console.log("active category ", activeCategories);
+
       try {
         const menuItems = await filterByQueryAndCategories(
           query,
           activeCategories
         );
-        console.log("search menu item ", menuItems);
         setData(menuItems);
       } catch (e) {
         console.log(e);
@@ -181,7 +191,10 @@ const Home = () => {
           </TouchableOpacity>
         }
       />
-      <Hero />
+      <Hero
+        handleSearchChange={handleSearchChange}
+        searchBarText={searchBarText}
+      />
       <Filters
         selections={filterSelections}
         onChange={handleFiltersChange}

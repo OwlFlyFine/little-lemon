@@ -189,4 +189,10 @@ export const styles = StyleSheet.create({
     borderBottomWidth: 2,
     marginBottom: 16,
   },
+  searchBar: {
+    marginBottom: 24,
+    backgroundColor: "#495E57",
+    shadowRadius: 0,
+    shadowOpacity: 0,
+  },
 });

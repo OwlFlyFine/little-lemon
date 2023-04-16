@@ -46,7 +46,7 @@ export async function filterByQueryAndCategories(query, activeCategories) {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `select * from menuitems where category in (${categoriesString})`,
+        `select * from menuitems where name like '%${query}%' and category in (${categoriesString})`,
         [],
         (_, { rows }) => {
           resolve(rows._array);

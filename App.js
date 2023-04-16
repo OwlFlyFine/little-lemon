@@ -43,6 +43,8 @@ export default function App() {
     return null;
   }
 
+  console.log("app state -", state);
+
   return (
     <NavigationContainer>
       <Stack.Navigator
