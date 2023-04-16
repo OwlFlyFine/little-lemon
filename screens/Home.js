@@ -17,10 +17,21 @@ import { colors } from "../styles/colors";
 import PageHeader from "../components/PageHeader";
 import Hero from "../components/Hero";
 import Filters from "../components/Filters";
+import {
+  createTable,
+  getMenuItems,
+  saveMenuItems,
+  filterByQueryAndCategories,
+} from "../utils/database";
 
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
-const sections = ["Starters", "Mains", "Desserts", "Drinks"];
+const sections = [
+  { id: 1, name: "Starters" },
+  { id: 2, name: "Mains" },
+  { id: 3, name: "Desserts" },
+  { id: 4, name: "Drinks" },
+];
 
 const Item = ({ name, price, description, image, category }) => (
   <View style={styles.item}>
@@ -96,7 +107,12 @@ const Home = () => {
     }
   };
 
-  const handleFiltersChange = async (index) => {};
+  const handleFiltersChange = async (index) => {
+    const arrayCopy = [...filterSelections];
+    arrayCopy[index] = !filterSelections[index];
+    console.log("filters ", arrayCopy);
+    setFilterSelections(arrayCopy);
+  };
 
   useEffect(() => {
     getUserInfo("onboard");
@@ -105,17 +121,13 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       try {
-        // await createTable();
-        // let menuItems = await getMenuItems();
+        await createTable();
+        let menuItems = await getMenuItems();
 
-        // The application only fetches the menu data once from a remote URL
-        // and then stores it into a SQLite database.
-        // After that, every application restart loads the menu from the database
-        // if (!menuItems.length) {
-        const menuItems = await fetchData();
-        console.log(menuItems);
-        // saveMenuItems(menuItems);
-        // }
+        if (!menuItems.length) {
+          menuItems = await fetchData();
+          saveMenuItems(menuItems);
+        }
         setData(menuItems);
       } catch (e) {
         // Handle error
@@ -158,7 +170,7 @@ const Home = () => {
       <FlatList
         style={{ paddingHorizontal: 10 }}
         data={data}
-        keyExtractor={(item) => item.id}
+        keyExtractor={({ item, index }) => index}
         ItemSeparatorComponent={
           <View
             style={{

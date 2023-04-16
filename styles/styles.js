@@ -181,4 +181,12 @@ export const styles = StyleSheet.create({
     gap: 10,
   },
   menuPicture: { width: 80, height: 80, marginLeft: 10 },
+  filters: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    padding: 10,
+    borderBottomColor: colors.highlight,
+    borderBottomWidth: 2,
+    marginBottom: 16,
+  },
 });
