@@ -33,7 +33,6 @@ const Onboarding = () => {
 
   const handleOnboardingComplete = () => {
     storeData({ firstName, email, isOnboardingCompleted: true });
-    navigation.navigate("Profile", { firstName, email });
   };
 
   useEffect(() => {
