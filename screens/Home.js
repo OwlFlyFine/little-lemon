@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Image, FlatList, TouchableOpacity, Alert } from "react-native";
+import {
+  View,
+  Image,
+  FlatList,
+  TouchableOpacity,
+  Alert,
+  Text,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import UserAvatar from "@muhzi/react-native-user-avatar";
 import { useNavigation } from "@react-navigation/native";
 
 import { styles } from "../styles/styles";
+import { colors } from "../styles/colors";
 import PageHeader from "../components/PageHeader";
 import Hero from "../components/Hero";
 import Filters from "../components/Filters";
@@ -13,10 +22,30 @@ const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
 const sections = ["Starters", "Mains", "Desserts", "Drinks"];
 
-const Item = ({ title, price }) => (
+const Item = ({ name, price, description, image, category }) => (
   <View style={styles.item}>
-    <Text style={styles.title}>{title}</Text>
-    <Text style={styles.title}>${price}</Text>
+    <View style={styles.itemContainer}>
+      <View style={styles.menu}>
+        <Text style={[styles.cardTitle, { fontWeight: 600, marginBottom: 0 }]}>
+          {name}
+        </Text>
+        <Text
+          numberOfLines={2}
+          ellipsizeMode="tail"
+          style={[styles.paragraph, { color: colors.black }]}>
+          {description}
+        </Text>
+        <Text style={[styles.paragraph, { color: colors.black }]}>
+          ${price}
+        </Text>
+      </View>
+      <Image
+        source={{
+          uri: `https://github.com/Meta-Mobile-Developer-PC/Working-With-Data-API/blob/main/images/${image}?raw=true`,
+        }}
+        style={styles.menuPicture}
+      />
+    </View>
   </View>
 );
 
@@ -60,7 +89,7 @@ const Home = () => {
         price: menu.price,
         description: menu.description,
         image: menu.image,
-        category: menu.category.title,
+        category: menu.category,
       }));
     } catch (error) {
       return [];
@@ -84,9 +113,10 @@ const Home = () => {
         // After that, every application restart loads the menu from the database
         // if (!menuItems.length) {
         const menuItems = await fetchData();
-        saveMenuItems(menuItems);
+        console.log(menuItems);
+        // saveMenuItems(menuItems);
         // }
-        setData(sectionListData);
+        setData(menuItems);
       } catch (e) {
         // Handle error
         Alert.alert(e.message);
@@ -129,8 +159,23 @@ const Home = () => {
         style={{ paddingHorizontal: 10 }}
         data={data}
         keyExtractor={(item) => item.id}
+        ItemSeparatorComponent={
+          <View
+            style={{
+              height: 1,
+              width: "100%",
+              marginVertical: 6,
+              backgroundColor: colors.highlight,
+            }}
+          />
+        }
         renderItem={({ item }) => (
-          <Item title={item.title} price={item.price} />
+          <Item
+            name={item.name}
+            price={item.price}
+            description={item.description}
+            image={item.image}
+          />
         )}
       />
     </SafeAreaView>

@@ -170,4 +170,15 @@ export const styles = StyleSheet.create({
     borderRadius: 100,
     backgroundColor: colors.white,
   },
+  itemContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  menu: {
+    flex: 1,
+    justifyContent: "flex-start",
+    gap: 10,
+  },
+  menuPicture: { width: 80, height: 80, marginLeft: 10 },
 });
