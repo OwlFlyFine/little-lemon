@@ -49,9 +49,9 @@ export default function App() {
         screenOptions={{
           headerShown: false,
         }}>
-        {state.isOnboardingCompleted ? (
+        {state?.isOnboardingCompleted ? (
           <>
-            {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
+            <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
           </>
         ) : (
