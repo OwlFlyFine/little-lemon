@@ -6,6 +6,10 @@ import UserAvatar from "@muhzi/react-native-user-avatar";
 import { styles } from "../styles/styles";
 import PageHeader from "../components/PageHeader";
 import Hero from "../components/Hero";
+import Filters from "../components/Filters";
+
+const API_URL = "";
+const sections = ["Starters", "Mains", "Desserts", "Drinks"];
 
 const Home = () => {
   const [userInfo, setUserInfo] = useState({
@@ -15,6 +19,12 @@ const Home = () => {
     phoneNumber: "",
     profilePicture: "",
   });
+  const [data, setData] = useState([]);
+  const [searchBarText, setSearchBarText] = useState("");
+  const [query, setQuery] = useState("");
+  const [filterSelections, setFilterSelections] = useState(
+    sections.map(() => false)
+  );
 
   const getUserInfo = async (key) => {
     try {
@@ -29,6 +39,8 @@ const Home = () => {
       console.log(e);
     }
   };
+
+  const handleFiltersChange = async (index) => {};
 
   useEffect(() => {
     getUserInfo("onboard");
@@ -52,6 +64,11 @@ const Home = () => {
         }
       />
       <Hero />
+      <Filters
+        selections={filterSelections}
+        onChange={handleFiltersChange}
+        sections={sections}
+      />
     </SafeAreaView>
   );
 };
