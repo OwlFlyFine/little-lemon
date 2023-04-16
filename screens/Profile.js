@@ -4,6 +4,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import UserAvatar from "@muhzi/react-native-user-avatar";
+import { useNavigation } from "@react-navigation/native";
 
 import { styles } from "../styles/styles";
 import { colors } from "../styles/colors";
@@ -13,6 +14,8 @@ import Checkbox from "../components/Checkbox";
 import PageHeader from "../components/PageHeader";
 
 const Profile = () => {
+  const navigation = useNavigation();
+
   const [userInfo, setUserInfo] = useState({
     firstName: "",
     lastName: "",
@@ -84,7 +87,7 @@ const Profile = () => {
     <View style={styles.container}>
       <PageHeader
         leftNode={
-          <TouchableOpacity onPress={() => undefined}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons
               name="arrow-back-circle-sharp"
               size={32}
