@@ -25,6 +25,7 @@ import {
   filterByQueryAndCategories,
 } from "../utils/database";
 import { useUpdateEffect } from "../utils/utils";
+import { getItem } from "../utils/asyncStorage";
 
 const API_URL =
   "https://raw.githubusercontent.com/Meta-Mobile-Developer-PC/Working-With-Data-API/main/capstone.json";
@@ -76,12 +77,13 @@ const Home = () => {
 
   const getUserInfo = async (key) => {
     try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      const parse = JSON.parse(jsonValue);
+      const jsonValue = await getItem(key);
       setUserInfo({
-        ...userInfo,
-        firstName: parse.firstName,
-        email: parse.email,
+        firstName: jsonValue.firstName,
+        lastName: jsonValue.lastName,
+        email: jsonValue.email,
+        phoneNumber: jsonValue.phoneNumber,
+        profilePicture: jsonValue.profilePicture,
       });
     } catch (e) {
       console.log(e);
@@ -122,7 +124,7 @@ const Home = () => {
   };
 
   useEffect(() => {
-    getUserInfo("onboard");
+    getUserInfo("UserInfo");
   }, []);
 
   useEffect(() => {
@@ -133,12 +135,10 @@ const Home = () => {
 
         if (!menuItems.length) {
           menuItems = await fetchData();
-          console.log(menuItems);
           menuItems.map((item) => saveMenuItems(item));
         }
         setData(menuItems);
       } catch (e) {
-        console.log(e.message);
         Alert.alert(e.message);
       }
     })();
@@ -160,7 +160,6 @@ const Home = () => {
         );
         setData(menuItems);
       } catch (e) {
-        console.log(e);
         Alert.alert(e.message);
       }
     })();
@@ -176,13 +175,7 @@ const Home = () => {
           />
         }
         rightNode={
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Profile", {
-                firstName: userInfo.firstName,
-                email: userInfo.email,
-              })
-            }>
+          <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
             <UserAvatar
               userName={userInfo.firstName + userInfo.lastName}
               size={40}
