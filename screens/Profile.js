@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import UserAvatar from "@muhzi/react-native-user-avatar";
 import { useNavigation } from "@react-navigation/native";
@@ -12,11 +11,14 @@ import FormInput from "../components/FormInput";
 import HeaderTitle from "../components/HeaderTitle";
 import Checkbox from "../components/Checkbox";
 import PageHeader from "../components/PageHeader";
+import { getItem, setItem, clear } from "../utils/asyncStorage";
+import { Context as AuthContext } from "../contexts/authContext";
 
 const Profile = () => {
   const navigation = useNavigation();
+  const { logout } = useContext(AuthContext);
 
-  const [userInfo, setUserInfo] = useState({
+  const [user, setUser] = useState({
     firstName: "",
     lastName: "",
     email: "",
@@ -28,25 +30,14 @@ const Profile = () => {
   const [emailSpecialOffers, setEmailSpecialOffers] = useState(false);
   const [emailNewsletter, setEmailNewsletter] = useState(false);
 
-  const handleFirstName = (text) =>
-    setUserInfo({ ...userInfo, firstName: text });
-  const handleLastName = (text) => setUserInfo({ ...userInfo, lastName: text });
-  const handleEmail = (text) => setUserInfo({ ...userInfo, email: text });
-  const handlePhoneNumber = (text) =>
-    setUserInfo({ ...userInfo, phoneNumber: text });
-
-  const clearUserInfo = async () => {
-    try {
-      await AsyncStorage.clear();
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  const handleFirstName = (text) => setUser({ ...user, firstName: text });
+  const handleLastName = (text) => setUser({ ...user, lastName: text });
+  const handleEmail = (text) => setUser({ ...user, email: text });
+  const handlePhoneNumber = (text) => setUser({ ...user, phoneNumber: text });
 
   const storeUserInfo = async (value) => {
     try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem("userInfo", jsonValue);
+      await setItem("UserInfo", value);
     } catch (e) {
       console.log(e);
     }
@@ -54,14 +45,20 @@ const Profile = () => {
 
   const getUserInfo = async (key) => {
     try {
-      const jsonValue = await AsyncStorage.getItem(key);
-      const parse = JSON.parse(jsonValue);
-      setUserInfo({
-        ...userInfo,
-        firstName: parse.firstName,
-        email: parse.email,
+      const jsonValue = await getItem(key);
+      setUser({
+        firstName: jsonValue.firstName,
+        lastName: jsonValue.lastName,
+        email: jsonValue.email,
+        phoneNumber: jsonValue.phoneNumber,
+        profilePicture: jsonValue.profilePicture,
       });
+      setEmailOrderStatuses(jsonValue.emailOrderStatuses);
+      setEmailPasswordChanges(jsonValue.emailPasswordChanges);
+      setEmailSpecialOffers(jsonValue.emailSpecialOffers);
+      setEmailNewsletter(jsonValue.emailNewsletter);
     } catch (e) {
+      console.error(e);
       console.log(e);
     }
   };
@@ -75,12 +72,17 @@ const Profile = () => {
     });
 
     if (!result.canceled) {
-      setUserInfo({ ...userInfo, profilePicture: result.assets[0].uri });
+      setUser({ ...user, profilePicture: result.assets[0].uri });
     }
   };
 
+  const handleLogout = () => {
+    clear();
+    logout();
+  };
+
   useEffect(() => {
-    getUserInfo("onboard");
+    getUserInfo("UserInfo");
   }, []);
 
   return (
@@ -114,9 +116,9 @@ const Profile = () => {
           }}>
           <Text>Avatar</Text>
           <UserAvatar
-            userName={userInfo.firstName + userInfo.lastName}
+            userName={user.firstName + user.lastName}
             size={80}
-            src={userInfo.profilePicture}
+            src={user.profilePicture}
           />
           <TouchableOpacity
             style={[styles.button, { height: 30, width: 100 }]}
@@ -127,26 +129,26 @@ const Profile = () => {
         <FormInput
           title="First Name"
           placeholder="Enter your first name"
-          value={userInfo.firstName}
+          value={user.firstName}
           onChangeText={handleFirstName}
         />
         <FormInput
           title="Last Name"
           placeholder="Enter your last name"
-          value={userInfo.lastName}
+          value={user.lastName}
           onChangeText={handleLastName}
         />
         <FormInput
           title="Email"
           placeholder="Enter your email"
-          value={userInfo.email}
+          value={user.email}
           onChangeText={handleEmail}
         />
         <FormInput
           isEmail
           title="Phone Number"
           placeholder="Enter your phone number"
-          value={userInfo.phoneNumber}
+          value={user.phoneNumber}
           onChangeText={handlePhoneNumber}
         />
         <HeaderTitle title="Email Notifications" />
@@ -177,7 +179,7 @@ const Profile = () => {
             styles.button,
             { backgroundColor: colors.primary2, marginBottom: 10 },
           ]}
-          onPress={() => clearUserInfo()}>
+          onPress={() => handleLogout()}>
           <Text style={styles.buttonText}>Logout</Text>
         </TouchableOpacity>
         <View style={styles.fixToButton}>
@@ -201,7 +203,7 @@ const Profile = () => {
             style={[styles.button, { flex: 1, height: 40 }]}
             onPress={() =>
               storeUserInfo({
-                ...userInfo,
+                ...user,
                 emailOrderStatuses,
                 emailPasswordChanges,
                 emailSpecialOffers,
