@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, TextInput, Image, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { styles } from "../styles/styles";
+import { getItem, setItem, clear } from "../utils/asyncStorage";
+import { Context as AuthContext } from "../contexts/authContext";
 
 const Onboarding = () => {
+  const { onboard } = useContext(AuthContext);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [valid, setValid] = useState(false);
@@ -22,17 +24,22 @@ const Onboarding = () => {
     }
   };
 
-  const storeData = async (value) => {
-    try {
-      const jsonValue = JSON.stringify(value);
-      await AsyncStorage.setItem("onboard", jsonValue);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
   const handleOnboardingComplete = () => {
-    storeData({ firstName, email, isOnboardingCompleted: true });
+    onboard();
+    setItem("OnboardingCompleted", true);
+    setItem("UserInfo", {
+      firstName: firstName,
+      lastName: "",
+      email: email,
+      phoneNumber: "",
+      profilePicture: "",
+      emailOrderStatuses: false,
+      emailPasswordChanges: false,
+      emailSpecialOffers: false,
+      emailNewsletter: false,
+    });
+    setFirstName("");
+    setEmail("");
   };
 
   useEffect(() => {
