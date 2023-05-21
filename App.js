@@ -1,34 +1,42 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useFonts } from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import SplashScreen from "./screens/Splash";
 import OnboardingScreen from "./screens/Onboarding";
 import HomeScreen from "./screens/Home";
 import ProfileScreen from "./screens/Profile";
-import SplashScreen from "./screens/Splash";
+import { getItem } from "./utils/asyncStorage";
+import { Provider as AuthProvider } from "./contexts/authContext";
+import { Context as AuthContext } from "./contexts/authContext";
 
 const Stack = createNativeStackNavigator();
 
-export default function App() {
+function App() {
+  const { state } = useContext(AuthContext);
+  console.log(state);
   const [isLoading, setIsLoading] = useState(true);
-  const [state, setState] = useState(null);
-
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("onboard");
-      setState(jsonValue != null ? JSON.parse(jsonValue) : null);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [onboardCompleted, setOnboardCompleted] = useState(false);
 
   useEffect(() => {
-    getData();
-  }, []);
+    (() => {
+      setTimeout(() => {
+        getOnboardState();
+        setIsLoading(false);
+      }, 1000);
+    })();
+  }, [state]);
+
+  const getOnboardState = async () => {
+    try {
+      const jsonValue = await getItem("OnboardingCompleted");
+      console.log("state ", jsonValue);
+      setOnboardCompleted(jsonValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const [fontsLoaded] = useFonts({
     "MarkaziText-Regular": require("./assets/fonts/MarkaziText-Regular.ttf"),
@@ -43,15 +51,13 @@ export default function App() {
     return null;
   }
 
-  console.log("app state -", state);
-
   return (
     <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
         }}>
-        {state?.isOnboardingCompleted ? (
+        {onboardCompleted && state.isOnboardingCompleted ? (
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="Profile" component={ProfileScreen} />
@@ -63,3 +69,11 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+export default () => {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+};
